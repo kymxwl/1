@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "TGI LMS",
+    "slug": "tgi-app",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "scheme": "tgi",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0B3D2E"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": true, "bundleIdentifier": "test.tgi.lms" },
+    "android": { "package": "test.tgi.lms" },
+    "web": { "bundler": "metro" },
+    "extra": {
+      "supabaseUrl": "https://YOUR-PROJECT.supabase.co",
+      "supabaseAnonKey": "YOUR-ANON-KEY"
+    }
+  }
+}

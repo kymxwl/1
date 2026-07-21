@@ -1,0 +1,24 @@
+# Local Supabase config. See https://supabase.com/docs/guides/cli/config
+project_id = "tgi-app"
+
+[db]
+port = 54322
+major_version = 15
+
+[api]
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[studio]
+port = 54323
+
+[auth]
+site_url = "tgi://"
+# Students authenticate with email; role lives in public.profiles.
+enable_signup = false
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
