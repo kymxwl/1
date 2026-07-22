@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -11,11 +11,10 @@ import type { AppRole } from '@/types/database';
 import SignInScreen from '@/screens/SignInScreen';
 import PassportScreen from '@/screens/PassportScreen';
 import CourseOutlineScreen from '@/screens/CourseOutlineScreen';
+import StaffConsoleScreen from '@/screens/StaffConsoleScreen';
+import { DEMO } from '@/demo';
 
 const Tab = createBottomTabNavigator();
-
-// The seed program id; in production this comes from the student's enrollment.
-const DEMO_PROGRAM_ID = '00000000-0000-0000-0000-000000000001';
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -67,17 +66,16 @@ export default function App() {
           {() => <PassportScreen />}
         </Tab.Screen>
         <Tab.Screen name="Curriculum" options={{ title: 'Course Outline' }}>
-          {() => <CourseOutlineScreen programId={DEMO_PROGRAM_ID} />}
+          {() => <CourseOutlineScreen programId={DEMO.programId} />}
         </Tab.Screen>
         {role && role !== 'student' && (
-          <Tab.Screen name="Staff" options={{ title: `Signed in as ${role}` }}>
+          <Tab.Screen name="Staff" options={{ title: 'Staff Console' }}>
             {() => (
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-                <Text style={{ color: theme.color.subtle, textAlign: 'center' }}>
-                  Instructor & admin consoles (take attendance, score practicals,
-                  reporting) mount here. See src/screens/TakeAttendanceScreen.tsx.
-                </Text>
-              </View>
+              <StaffConsoleScreen
+                profileId={session.user.id}
+                displayName={session.user.email ?? 'Staff'}
+                role={role}
+              />
             )}
           </Tab.Screen>
         )}
