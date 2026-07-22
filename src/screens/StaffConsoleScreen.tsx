@@ -6,13 +6,14 @@ import TakeAttendanceScreen from '@/screens/TakeAttendanceScreen';
 import SkillEvaluationScreen from '@/screens/SkillEvaluationScreen';
 import SecureExamScreen from '@/screens/SecureExamScreen';
 import ReportingScreen from '@/screens/ReportingScreen';
+import CompletionScreen from '@/screens/CompletionScreen';
 
 /**
  * Instructor / admin hub. Switches between the M3/M5/M6/M9 consoles, wired to
  * the seeded demo cohort. In production the target cohort/session/student comes
  * from live pickers rather than DEMO constants.
  */
-type View_ = 'menu' | 'attendance' | 'skill' | 'exam' | 'reporting';
+type View_ = 'menu' | 'attendance' | 'skill' | 'exam' | 'reporting' | 'completion';
 
 interface Props {
   profileId: string;
@@ -66,6 +67,13 @@ export default function StaffConsoleScreen({ profileId, displayName, role }: Pro
       </Framed>
     );
   }
+  if (view === 'completion') {
+    return (
+      <Framed title="Completion" onBack={() => setView('menu')}>
+        <CompletionScreen enrollmentId={DEMO.enrollmentId} />
+      </Framed>
+    );
+  }
 
   return (
     <View style={s.screen}>
@@ -75,7 +83,10 @@ export default function StaffConsoleScreen({ profileId, displayName, role }: Pro
       <MenuButton label="Score a skill" hint="M6 · tier computed by the system" onPress={() => setView('skill')} />
       <MenuButton label="Proctor a secure exam" hint="M5 · server-side grading" onPress={() => setView('exam')} />
       {role === 'admin' && (
-        <MenuButton label="Reporting" hint="M9 · registers & rosters from the ledger" onPress={() => setView('reporting')} />
+        <>
+          <MenuButton label="Reporting" hint="M9 · registers & rosters from the ledger" onPress={() => setView('reporting')} />
+          <MenuButton label="Completion & certificate" hint="M8 · one-button issue, gapless number" onPress={() => setView('completion')} />
+        </>
       )}
     </View>
   );
