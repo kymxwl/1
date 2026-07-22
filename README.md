@@ -27,11 +27,17 @@ never reach the client**, and **clock hours as the regulatory unit**.
 - Seed data: the program, 25 chapters, lessons, skills+benchmarks, assessments,
   a cohort with sessions and sample attendance/skill data
 
-**Frontend — Expo app (typechecks cleanly, representative screens):**
-- Typed Supabase data layer + one service module per module (M1–M8)
-- Screens: Sign-in, Dealer Passport (M7), Course Outline (M1),
-  Take Attendance with offline queue (M3)
-- Instructor/admin consoles are stubbed where they mount
+**Frontend — Expo app (typechecks cleanly):**
+- Typed Supabase data layer + one service module per module (M1–M9)
+- Student screens: Sign-in, Dealer Passport (M7), Course Outline (M1)
+- Staff console: Take Attendance w/ offline queue (M3), Score a Skill (M6),
+  Proctor a Secure Exam (M5), Reporting — registers & rosters (M9)
+
+**CI (`.github/workflows/ci.yml`):**
+- `typecheck` job: `npm ci` + `tsc --noEmit`
+- `database` job: spins up Postgres, applies all migrations + seed, runs
+  `.github/ci/smoke.sql` (ledger math, computed tier, answer-key isolation,
+  proctor enforcement, append-only block)
 
 See [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) for the model and
 [`docs/DECISIONS.md`](docs/DECISIONS.md) for the resolved Open Decisions (§6).
@@ -99,6 +105,8 @@ corresponding Supabase Auth user with a matching `profiles.id`.
 ## Not in scope (v1, per spec §1)
 
 Forums/messaging, video hosting, payment/refund logic, public self-serve
-enrollment. Modules M5 (secure-exam delivery UI), M6 (rubric capture UI), and M9
-(admin reporting UI) have their **data + service layers** in place; their
-screens are the next build increment.
+enrollment.
+
+M2 (cohort/session generation UI) and M8 (certificate PDF rendering) remain at
+the data + service layer; certificate PDFs are rendered by an edge function that
+fills the `pdf_url` reserved by `issue_certificate()`.
