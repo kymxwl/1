@@ -27,66 +27,13 @@ insert into payment_records (student_id, pathway, is_approved) values
   ('00000000-0000-0000-0000-0000000000d1', 'card', true),
   ('00000000-0000-0000-0000-0000000000d2', 'wioa', true);
 
--- ---- Program / course ------------------------------------------------------
-insert into programs (id, name, version, total_clock_hours, is_active, effective_date) values
-  ('00000000-0000-0000-0000-000000000001', 'Professional Poker Dealer', '2026.1', 100, true, '2026-01-01')
-on conflict (id) do nothing;
-
-insert into attendance_policies (program_id) values
-  ('00000000-0000-0000-0000-000000000001')
-on conflict (program_id) do nothing;   -- defaults = resolved decisions
-
-insert into courses (id, program_id, name, sequence, clock_hours) values
-  ('00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001',
-   'Poker Dealing Core', 1, 100)
-on conflict (id) do nothing;
-
--- ---- 25 chapters (maps to the manual) --------------------------------------
-insert into chapters (course_id, number, title, sequence, clock_hours, manual_page_ref)
-select
-  '00000000-0000-0000-0000-000000000010',
-  n,
-  title,
-  n,
-  4,                              -- 25 * 4 = 100 clock hours
-  'Manual p.' || (n * 10)::text
-from (values
-  (1,'Table Setup & Chip Handling'),
-  (2,'The Deck: Inspection, Wash & Verification'),
-  (3,'Standard Shuffle Sequence'),
-  (4,'The Riffle, Strip & Box'),
-  (5,'Cutting the Deck & The Cut Card'),
-  (6,'Pitching Cards & Delivery Mechanics'),
-  (7,'Reading the Board & Hand Rankings'),
-  (8,'Texas Hold''em Dealing Procedure'),
-  (9,'Omaha Dealing Procedure'),
-  (10,'Seven-Card Stud Procedure'),
-  (11,'Managing the Button & Blinds'),
-  (12,'Pot Management & Pot Sizing'),
-  (13,'Side Pot Construction'),
-  (14,'Collecting the Rake & Drop'),
-  (15,'Awarding the Pot & Odd Chips'),
-  (16,'Handling All-In Situations'),
-  (17,'Splitting Pots & Chopping'),
-  (18,'Tournament Dealing Fundamentals'),
-  (19,'Blind Structures & Clock Management'),
-  (20,'Chip Race & Color-Up Procedure'),
-  (21,'Player Etiquette & Table Control'),
-  (22,'Handling Disputes & Floor Calls'),
-  (23,'Irregularities, Misdeals & Penalties'),
-  (24,'Responsible Gaming & Compliance'),
-  (25,'Texas Gaming Regulation Overview')
-) as c(n, title)
-on conflict (course_id, number) do nothing;
-
--- One lesson per chapter (title mirrors the chapter for the demo outline).
-insert into lessons (chapter_id, title, sequence, objectives, estimated_minutes)
-select ch.id, ch.title || ' -- Lesson', 1,
-       jsonb_build_array('Understand ' || ch.title, 'Demonstrate ' || ch.title),
-       45
-from chapters ch
-where ch.course_id = '00000000-0000-0000-0000-000000000010'
-on conflict (chapter_id, sequence) do nothing;
+-- ---- Curriculum: program, course, 25 chapters, lessons --------------------
+-- Canonical content lives in content/curriculum_2026_1.sql (the institute's
+-- editable source of truth). Included here so the demo/local DB uses exactly
+-- the same 25 chapters as a real deployment. Runs before any cohort exists,
+-- so the curriculum-freeze trigger does not block it. `\ir` resolves relative
+-- to this file's directory (supabase/).
+\ir content/curriculum_2026_1.sql
 
 -- A couple of student-visible resources.
 insert into resources (owner_type, owner_id, kind, title, url, visibility)

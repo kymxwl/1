@@ -36,6 +36,22 @@ The function reads `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from the
 Supabase-managed environment — no extra secrets needed for the default setup.
 If you add custom secrets later: `supabase secrets set KEY=value`.
 
+## 3a. Load curriculum content (real projects)
+
+The demo seed is off-limits in production, but the curriculum is shipped as a
+standalone, idempotent content module you *do* load — the institute's editable
+source of truth for the 25 chapters, lessons, objectives, and attendance policy:
+
+```bash
+psql "$DATABASE_URL" -f supabase/content/curriculum_2026_1.sql
+```
+
+Edit that file (titles, clock hours, objectives, page refs) and re-run to update
+— **but only before a cohort is pinned to the program.** Once a cohort exists the
+curriculum-freeze trigger blocks edits; new content then goes into a new program
+version (`content/curriculum_2027_1.sql`, etc.). Question banks, skill benchmarks,
+and flash-card decks load the same way as they become available.
+
 ## 4. Bootstrap the first admin
 
 Signup auto-creates a `profiles` row with role `student` (the

@@ -29,7 +29,8 @@ accounts / credentials · **[institute]** curriculum & policy owners ·
 - [ ] **[code]** Optional integrity FK `profiles.id → auth.users(id)` once off the demo seed (DEPLOY.md hardening).
 
 ## Phase 3 — Real content + ratified policy
-- [ ] **[institute]** The real 25-chapter content, lecture-deck URLs, flash-card decks.
+- [x] **[code]** Curriculum content module (`supabase/content/curriculum_2026_1.sql`) — the 25 chapters + lessons/objectives + policy as an idempotent, institute-editable source of truth (loaded before any cohort; freeze-protected after). Titles/hours/objectives are a professional starting structure to verify against the manual.
+- [ ] **[institute]** Verify/replace the chapter content vs the real manual; add lecture-deck URLs and flash-card decks.
 - [ ] **[institute]** Full question banks: Appendix L **Form A** and secure **Form B** (~100 each), with explanations.
 - [ ] **[institute]** Skill benchmarks (Bronze/Silver/Gold thresholds) per competency.
 - [ ] **[TWC + institute]** Ratify the 8 Open Decisions in `docs/DECISIONS.md` (stored as data — confirm or edit values, no code change).
