@@ -30,9 +30,9 @@ never reach the client**, and **clock hours as the regulatory unit**.
 **Frontend — Expo app (typechecks cleanly):**
 - Typed Supabase data layer + one service module per module (M1–M9)
 - Student screens: Sign-in, Dealer Passport (M7), Course Outline (M1)
-- Staff console: Take Attendance w/ offline queue (M3), Score a Skill (M6),
-  Proctor a Secure Exam (M5), Reporting — registers & rosters (M9),
-  Completion & Certificate — one-button issue (M8)
+- Staff console: Cohorts & scheduling (M2), Take Attendance w/ offline queue
+  (M3), Score a Skill (M6), Proctor a Secure Exam (M5), Reporting — registers &
+  rosters (M9), Completion & Certificate — one-button issue (M8)
 - Certificate PDFs are rendered by the `issue-certificate` **edge function**
   (`supabase/functions/`): it computes eligibility, issues the gapless number,
   renders the PDF (`pdf-lib`), and stores it in a private `certificates` bucket
@@ -42,7 +42,7 @@ never reach the client**, and **clock hours as the regulatory unit**.
 - `typecheck` job: `npm ci` + `tsc --noEmit`
 - `database` job: spins up Postgres, applies all migrations + seed, runs
   `.github/ci/smoke.sql` (ledger math, computed tier, answer-key isolation,
-  proctor enforcement, append-only block)
+  proctor enforcement, append-only block, session-calendar generation)
 
 See [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) for the model and
 [`docs/DECISIONS.md`](docs/DECISIONS.md) for the resolved Open Decisions (§6).
@@ -51,7 +51,8 @@ See [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) for the model and
 
 ```
 supabase/
-  migrations/       11 ordered SQL migrations (schema → functions → RLS → guards)
+  migrations/       14 ordered SQL migrations (schema → functions → RLS → guards → storage)
+  functions/        issue-certificate edge function (M8)
   seed.sql          demo data (safe on `supabase db reset`)
   config.toml       local Supabase config
 src/
@@ -112,5 +113,5 @@ corresponding Supabase Auth user with a matching `profiles.id`.
 Forums/messaging, video hosting, payment/refund logic, public self-serve
 enrollment.
 
-M2 (cohort/session generation UI) remains at the data + service layer. All
-other modules (M1, M3–M9) have a working UI or console.
+All nine build-order modules (M1–M9) now have a working UI or console backed by
+the server-side rules.

@@ -175,6 +175,13 @@ export interface Database {
         Returns: string;
       };
       current_app_role: { Args: Record<string, never>; Returns: AppRole };
+      generate_cohort_sessions: {
+        Args: {
+          p_cohort_id: string; p_weekdays: number[]; p_start_time: string;
+          p_end_time: string; p_scheduled_clock_hours: number; p_session_type?: string;
+        };
+        Returns: number;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

@@ -69,3 +69,38 @@ begin
   end if;
   raise notice 'SMOKE OK: attendance UPDATE blocked';
 end$$;
+
+-- Session-calendar generation (M2): expand a Mon–Fri template over the seeded
+-- cohort and confirm rows appear, existing sessions are not duplicated.
+do $$
+declare
+  n           int;
+  before_cnt  int;
+  after_cnt   int;
+begin
+  select count(*) into before_cnt
+  from sessions where cohort_id = '00000000-0000-0000-0000-000000000401';
+
+  -- 08:00 start (distinct from the seeded 09:00 rows), Mon–Fri.
+  select generate_cohort_sessions(
+    '00000000-0000-0000-0000-000000000401',
+    array[1,2,3,4,5], '08:00', '12:00', 4, 'lecture'
+  ) into n;
+
+  select count(*) into after_cnt
+  from sessions where cohort_id = '00000000-0000-0000-0000-000000000401';
+
+  if n <= 0 or after_cnt <> before_cnt + n then
+    raise exception 'SMOKE FAIL: session generation inserted % (before %, after %)', n, before_cnt, after_cnt;
+  end if;
+
+  -- Idempotent: a second run over the same template inserts nothing.
+  if generate_cohort_sessions(
+       '00000000-0000-0000-0000-000000000401',
+       array[1,2,3,4,5], '08:00', '12:00', 4, 'lecture'
+     ) <> 0 then
+    raise exception 'SMOKE FAIL: session generation is not idempotent';
+  end if;
+
+  raise notice 'SMOKE OK: session generation inserted % rows, idempotent on re-run', n;
+end$$;
