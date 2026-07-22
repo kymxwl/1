@@ -180,6 +180,7 @@ export interface Database {
         Returns: string;
       };
       current_app_role: { Args: Record<string, never>; Returns: AppRole };
+      set_user_role: { Args: { p_user_id: string; p_role: AppRole }; Returns: undefined };
       attempt_feedback: { Args: { p_attempt_id: string }; Returns: Json };
       generate_cohort_sessions: {
         Args: {

@@ -19,6 +19,18 @@ export async function signOut() {
   await supabase.auth.signOut();
 }
 
+/**
+ * Admin: assign a role to a user (instructor/admin/student). Enforced
+ * admin-only by the set_user_role() DB function regardless of the client.
+ */
+export async function setUserRole(userId: string, role: AppRole): Promise<void> {
+  const { error } = await supabase.rpc('set_user_role', {
+    p_user_id: userId,
+    p_role: role,
+  });
+  if (error) throw error;
+}
+
 /** The signed-in student's active enrollment (for the Passport screen). */
 export async function getMyActiveEnrollment(): Promise<Enrollment | null> {
   const { data, error } = await supabase

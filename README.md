@@ -47,12 +47,14 @@ never reach the client**, and **clock hours as the regulatory unit**.
 
 See [`docs/DATA_MODEL.md`](docs/DATA_MODEL.md) for the model and
 [`docs/DECISIONS.md`](docs/DECISIONS.md) for the resolved Open Decisions (§6).
+To stand up a real Supabase project see [`DEPLOY.md`](DEPLOY.md); for the full
+path to production see [`docs/COMPLETION.md`](docs/COMPLETION.md).
 
 ## Repository layout
 
 ```
 supabase/
-  migrations/       14 ordered SQL migrations (schema → functions → RLS → guards → storage)
+  migrations/       16 ordered SQL migrations (schema → functions → RLS → guards → storage → auth)
   functions/        issue-certificate edge function (M8)
   seed.sql          demo data (safe on `supabase db reset`)
   config.toml       local Supabase config

@@ -145,3 +145,31 @@ begin
 
   raise notice 'SMOKE OK: practice feedback returns explanations, secure exam refused';
 end$$;
+
+-- Auth (Phase 2): set_user_role is admin-gated. A non-admin cannot elevate;
+-- an admin can. Uses seeded profiles (a1 admin, c2 student/Riley).
+do $$
+declare
+  blocked boolean := false;
+begin
+  -- As a student (Sam, …c1): elevation must be refused.
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000c1', true);
+  begin
+    perform set_user_role('00000000-0000-0000-0000-0000000000c2', 'instructor');
+  exception when others then
+    blocked := true;   -- expected: admin role required
+  end;
+  if not blocked then
+    raise exception 'SMOKE FAIL: a non-admin changed a user role';
+  end if;
+
+  -- As an admin (Dana, …a1): elevation applies, then restore.
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000a1', true);
+  perform set_user_role('00000000-0000-0000-0000-0000000000c2', 'instructor');
+  if (select role from profiles where id = '00000000-0000-0000-0000-0000000000c2') <> 'instructor' then
+    raise exception 'SMOKE FAIL: admin role change did not apply';
+  end if;
+  perform set_user_role('00000000-0000-0000-0000-0000000000c2', 'student');  -- restore
+
+  raise notice 'SMOKE OK: set_user_role is admin-gated';
+end$$;
