@@ -104,3 +104,44 @@ begin
 
   raise notice 'SMOKE OK: session generation inserted % rows, idempotent on re-run', n;
 end$$;
+
+-- Practice feedback (M4): a graded NON-SECURE attempt yields explanations;
+-- a SECURE assessment never does.
+do $$
+declare
+  fb        jsonb;
+  secure_ok boolean := false;
+begin
+  -- Non-secure chapter-12 quiz attempt for Sam (…501), graded.
+  insert into assessment_attempts (id, enrollment_id, assessment_id, attempt_number, responses)
+  values ('00000000-0000-0000-0000-0000000fb001','00000000-0000-0000-0000-000000000501',
+          '00000000-0000-0000-0000-000000000201', 1,
+          '{"00000000-0000-0000-0000-000000000301":"b","00000000-0000-0000-0000-000000000302":"true","00000000-0000-0000-0000-000000000303":"cut card"}');
+  perform grade_attempt('00000000-0000-0000-0000-0000000fb001');
+
+  -- Act as Sam so the ownership check in attempt_feedback passes.
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000c1', true);
+  fb := attempt_feedback('00000000-0000-0000-0000-0000000fb001');
+  if jsonb_array_length(fb) <> 3 then
+    raise exception 'SMOKE FAIL: expected 3 feedback items, got %', jsonb_array_length(fb);
+  end if;
+  if (fb -> 0 ->> 'explanation') is null then
+    raise exception 'SMOKE FAIL: feedback missing explanation';
+  end if;
+
+  -- Secure exam: feedback must be refused even after grading.
+  insert into assessment_attempts (id, enrollment_id, assessment_id, attempt_number, proctored_by, responses)
+  values ('00000000-0000-0000-0000-0000000fb002','00000000-0000-0000-0000-000000000501',
+          '00000000-0000-0000-0000-000000000202', 2, '00000000-0000-0000-0000-0000000000b1', '{}');
+  perform grade_attempt('00000000-0000-0000-0000-0000000fb002');
+  begin
+    perform attempt_feedback('00000000-0000-0000-0000-0000000fb002');
+  exception when others then
+    secure_ok := true;   -- expected: refused for secure assessments
+  end;
+  if not secure_ok then
+    raise exception 'SMOKE FAIL: attempt_feedback exposed a secure exam';
+  end if;
+
+  raise notice 'SMOKE OK: practice feedback returns explanations, secure exam refused';
+end$$;

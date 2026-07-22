@@ -29,7 +29,8 @@ never reach the client**, and **clock hours as the regulatory unit**.
 
 **Frontend — Expo app (typechecks cleanly):**
 - Typed Supabase data layer + one service module per module (M1–M9)
-- Student screens: Sign-in, Dealer Passport (M7), Course Outline (M1)
+- Student screens: Sign-in, Dealer Passport (M7), Course Outline (M1),
+  Practice — flash cards & quizzes with post-submission feedback (M4)
 - Staff console: Cohorts & scheduling (M2), Take Attendance w/ offline queue
   (M3), Score a Skill (M6), Proctor a Secure Exam (M5), Reporting — registers &
   rosters (M9), Completion & Certificate — one-button issue (M8)

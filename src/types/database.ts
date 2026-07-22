@@ -79,6 +79,10 @@ export interface AssessmentAttempt {
   score: number | null; passed: boolean | null; proctored_by: string | null;
   responses: Json; void: boolean; void_reason: string | null;
 }
+export interface Flashcard {
+  id: string; chapter_id: string; front: string; back: string;
+  sequence: number; is_active: boolean;
+}
 export interface Skill {
   id: string; program_id: string; name: string;
   category: string | null; sequence: number;
@@ -144,6 +148,7 @@ export interface Database {
         Pick<AssessmentAttempt, 'enrollment_id' | 'assessment_id' | 'attempt_number' | 'responses'> &
           Partial<Pick<AssessmentAttempt, 'proctored_by' | 'started_at'>>
       >;
+      flashcards: TableDef<Flashcard>;
       skills: TableDef<Skill>;
       skill_benchmarks: TableDef<SkillBenchmark>;
       skill_evaluations: TableDef<
@@ -175,6 +180,7 @@ export interface Database {
         Returns: string;
       };
       current_app_role: { Args: Record<string, never>; Returns: AppRole };
+      attempt_feedback: { Args: { p_attempt_id: string }; Returns: Json };
       generate_cohort_sessions: {
         Args: {
           p_cohort_id: string; p_weekdays: number[]; p_start_time: string;
