@@ -9,5 +9,7 @@ export const DEMO = {
   sessionId: '00000000-0000-0000-0000-000000000601',
   enrollmentId: '00000000-0000-0000-0000-000000000501',
   finalFormA: '00000000-0000-0000-0000-000000000202',
+  chapterQuiz: '00000000-0000-0000-0000-000000000201',
+  flashcardChapterNumber: 12,
   scheduledMinutes: 240, // 4.00 scheduled clock hours
 } as const;

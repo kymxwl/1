@@ -59,3 +59,22 @@ Regenerate the app's types after a schema change:
 ```bash
 supabase gen types typescript --local > ../src/types/supabase.ts
 ```
+
+## Edge functions (M8)
+
+`functions/issue-certificate/` computes eligibility, issues the gapless
+certificate number, renders the PDF, and stores it in the private
+`certificates` bucket. Deploy and test:
+
+```bash
+supabase functions deploy issue-certificate
+# invoke with an admin user's bearer token:
+curl -X POST "$SUPABASE_URL/functions/v1/issue-certificate" \
+  -H "Authorization: Bearer $ADMIN_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"enrollment_id":"<uuid>"}'
+```
+
+The `certificates` bucket + storage RLS are created by
+`migrations/20260101001200_storage.sql` (a no-op on bare Postgres, so CI is
+unaffected).

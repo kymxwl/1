@@ -95,6 +95,17 @@ select 'chapter', ch.id, 'flashcards', ch.title || ' Flash Cards',
 from chapters ch
 where ch.course_id = '00000000-0000-0000-0000-000000000010' and ch.number in (12, 13);
 
+-- Flash cards (study content) for chapter 12. Separate from question_bank.
+insert into flashcards (chapter_id, front, back, sequence)
+select ch.id, c.front, c.back, c.seq
+from (values
+  ('Main pot', 'The pot every contesting player is eligible to win.', 1),
+  ('Side pot', 'A separate pot built when a player is all-in for less than a full call.', 2),
+  ('Cut card', 'The solid card used to protect the bottom of the deck.', 3),
+  ('Capped bet', 'A player''s contribution limited by their all-in amount.', 4)
+) as c(front, back, seq)
+join chapters ch on ch.number = 12 and ch.course_id = '00000000-0000-0000-0000-000000000010';
+
 -- ---- Skills + benchmarks (zero-discretion criteria) ------------------------
 insert into skills (id, program_id, name, category, sequence) values
   ('00000000-0000-0000-0000-000000000101','00000000-0000-0000-0000-000000000001','TGI Standard Shuffle Sequence','mechanics',1),
