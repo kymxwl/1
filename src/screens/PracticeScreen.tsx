@@ -60,7 +60,7 @@ export default function PracticeScreen() {
   return (
     <View style={s.screen}>
       <Text style={s.h1}>Practice</Text>
-      <Text style={s.subtle}>Chapter 12 · Pot Management</Text>
+      <Text style={s.subtle}>Chapter 10 · Pot Management &amp; Side Pots</Text>
       {error && <Text style={s.error}>{error}</Text>}
       <Pressable style={s.btn} onPress={() => setView('flashcards')} disabled={!chapterId}>
         <Text style={s.btnLabel}>🃏 Flash cards</Text>

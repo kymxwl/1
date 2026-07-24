@@ -27,75 +27,26 @@ insert into payment_records (student_id, pathway, is_approved) values
   ('00000000-0000-0000-0000-0000000000d1', 'card', true),
   ('00000000-0000-0000-0000-0000000000d2', 'wioa', true);
 
--- ---- Program / course ------------------------------------------------------
-insert into programs (id, name, version, total_clock_hours, is_active, effective_date) values
-  ('00000000-0000-0000-0000-000000000001', 'Professional Poker Dealer', '2026.1', 100, true, '2026-01-01')
-on conflict (id) do nothing;
+-- ---- Curriculum: program, course, 25 chapters, lessons --------------------
+-- Canonical content lives in content/curriculum_2026_1.sql (the institute's
+-- editable source of truth). Included here so the demo/local DB uses exactly
+-- the same 25 chapters as a real deployment. Runs before any cohort exists,
+-- so the curriculum-freeze trigger does not block it. `\ir` resolves relative
+-- to this file's directory (supabase/).
+\ir content/curriculum_2026_1.sql
 
-insert into attendance_policies (program_id) values
-  ('00000000-0000-0000-0000-000000000001')
-on conflict (program_id) do nothing;   -- defaults = resolved decisions
-
-insert into courses (id, program_id, name, sequence, clock_hours) values
-  ('00000000-0000-0000-0000-000000000010', '00000000-0000-0000-0000-000000000001',
-   'Poker Dealing Core', 1, 100)
-on conflict (id) do nothing;
-
--- ---- 25 chapters (maps to the manual) --------------------------------------
-insert into chapters (course_id, number, title, sequence, clock_hours, manual_page_ref)
-select
-  '00000000-0000-0000-0000-000000000010',
-  n,
-  title,
-  n,
-  4,                              -- 25 * 4 = 100 clock hours
-  'Manual p.' || (n * 10)::text
-from (values
-  (1,'Table Setup & Chip Handling'),
-  (2,'The Deck: Inspection, Wash & Verification'),
-  (3,'Standard Shuffle Sequence'),
-  (4,'The Riffle, Strip & Box'),
-  (5,'Cutting the Deck & The Cut Card'),
-  (6,'Pitching Cards & Delivery Mechanics'),
-  (7,'Reading the Board & Hand Rankings'),
-  (8,'Texas Hold''em Dealing Procedure'),
-  (9,'Omaha Dealing Procedure'),
-  (10,'Seven-Card Stud Procedure'),
-  (11,'Managing the Button & Blinds'),
-  (12,'Pot Management & Pot Sizing'),
-  (13,'Side Pot Construction'),
-  (14,'Collecting the Rake & Drop'),
-  (15,'Awarding the Pot & Odd Chips'),
-  (16,'Handling All-In Situations'),
-  (17,'Splitting Pots & Chopping'),
-  (18,'Tournament Dealing Fundamentals'),
-  (19,'Blind Structures & Clock Management'),
-  (20,'Chip Race & Color-Up Procedure'),
-  (21,'Player Etiquette & Table Control'),
-  (22,'Handling Disputes & Floor Calls'),
-  (23,'Irregularities, Misdeals & Penalties'),
-  (24,'Responsible Gaming & Compliance'),
-  (25,'Texas Gaming Regulation Overview')
-) as c(n, title)
-on conflict (course_id, number) do nothing;
-
--- One lesson per chapter (title mirrors the chapter for the demo outline).
-insert into lessons (chapter_id, title, sequence, objectives, estimated_minutes)
-select ch.id, ch.title || ' -- Lesson', 1,
-       jsonb_build_array('Understand ' || ch.title, 'Demonstrate ' || ch.title),
-       45
-from chapters ch
-where ch.course_id = '00000000-0000-0000-0000-000000000010'
-on conflict (chapter_id, sequence) do nothing;
+-- Appendix L — the real 100-question written final (instructor-graded).
+\ir content/exam_appendix_l_2026_1.sql
 
 -- A couple of student-visible resources.
 insert into resources (owner_type, owner_id, kind, title, url, visibility)
 select 'chapter', ch.id, 'flashcards', ch.title || ' Flash Cards',
        'https://decks.tgi.test/ch' || ch.number, 'student'
 from chapters ch
-where ch.course_id = '00000000-0000-0000-0000-000000000010' and ch.number in (12, 13);
+where ch.course_id = '00000000-0000-0000-0000-000000000010' and ch.number in (10, 11);
 
--- Flash cards (study content) for chapter 12. Separate from question_bank.
+-- Flash cards (study content) for Ch 10 Pot Management & Side Pot Construction.
+-- Separate from question_bank so nothing here can leak a secure exam key.
 insert into flashcards (chapter_id, front, back, sequence)
 select ch.id, c.front, c.back, c.seq
 from (values
@@ -104,39 +55,15 @@ from (values
   ('Cut card', 'The solid card used to protect the bottom of the deck.', 3),
   ('Capped bet', 'A player''s contribution limited by their all-in amount.', 4)
 ) as c(front, back, seq)
-join chapters ch on ch.number = 12 and ch.course_id = '00000000-0000-0000-0000-000000000010';
+join chapters ch on ch.number = 10 and ch.course_id = '00000000-0000-0000-0000-000000000010';
 
--- ---- Skills + benchmarks (zero-discretion criteria) ------------------------
-insert into skills (id, program_id, name, category, sequence) values
-  ('00000000-0000-0000-0000-000000000101','00000000-0000-0000-0000-000000000001','TGI Standard Shuffle Sequence','mechanics',1),
-  ('00000000-0000-0000-0000-000000000102','00000000-0000-0000-0000-000000000001','Side Pot Construction','math',2),
-  ('00000000-0000-0000-0000-000000000103','00000000-0000-0000-0000-000000000001','Pot Sizing','math',3)
-on conflict (id) do nothing;
+-- Skills + benchmarks now live in content/curriculum_2026_1.sql (from the
+-- manual's Performance Benchmarks table), \ir-included above. The demo skill
+-- evaluation below references skill 101 (Full Shuffle).
 
--- Shuffle: time metric, lower is better (seconds).
-insert into skill_benchmarks (skill_id, tier, metric_type, threshold, description, criteria) values
-  ('00000000-0000-0000-0000-000000000101','bronze','time', 25, 'Complete shuffle in <= 25s', '{}'),
-  ('00000000-0000-0000-0000-000000000101','silver','time', 18, 'Complete shuffle in <= 18s', '{}'),
-  ('00000000-0000-0000-0000-000000000101','gold',  'time', 14, 'Complete shuffle in <= 14s', '{}');
-
--- Side pot: checklist metric (count of required items correct).
-insert into skill_benchmarks (skill_id, tier, metric_type, threshold, description, criteria) values
-  ('00000000-0000-0000-0000-000000000102','bronze','checklist', 3, '3 of 5 steps correct',
-     '{"required":["identify_allin","separate_capped","build_main","build_side","announce"]}'),
-  ('00000000-0000-0000-0000-000000000102','silver','checklist', 4, '4 of 5 steps correct',
-     '{"required":["identify_allin","separate_capped","build_main","build_side","announce"]}'),
-  ('00000000-0000-0000-0000-000000000102','gold',  'checklist', 5, 'All 5 steps correct',
-     '{"required":["identify_allin","separate_capped","build_main","build_side","announce"]}');
-
--- Pot sizing: accuracy metric, higher is better (% correct).
-insert into skill_benchmarks (skill_id, tier, metric_type, threshold, description, criteria) values
-  ('00000000-0000-0000-0000-000000000103','bronze','accuracy', 80, '>= 80% correct', '{}'),
-  ('00000000-0000-0000-0000-000000000103','silver','accuracy', 90, '>= 90% correct', '{}'),
-  ('00000000-0000-0000-0000-000000000103','gold',  'accuracy', 98, '>= 98% correct', '{}');
-
--- ---- Assessments: a chapter-12 quiz + Form A / Form B finals ---------------
+-- ---- Assessments: a chapter-10 quiz + Form A / Form B finals ---------------
 insert into assessments (id, program_id, kind, form_code, title, question_count, passing_score, time_limit_minutes, is_secure, max_attempts, randomize_order) values
-  ('00000000-0000-0000-0000-000000000201','00000000-0000-0000-0000-000000000001','chapter_quiz', null, 'Chapter 12 Quiz: Pot Management', 3, 70, 15, false, 5, true),
+  ('00000000-0000-0000-0000-000000000201','00000000-0000-0000-0000-000000000001','chapter_quiz', null, 'Chapter 10 Quiz: Pot Management & Side Pots', 3, 70, 15, false, 5, true),
   ('00000000-0000-0000-0000-000000000202','00000000-0000-0000-0000-000000000001','final_exam',  'A',  'Final Exam -- Form A (Appendix L)', 3, 75, 120, true, 1, false),
   ('00000000-0000-0000-0000-000000000203','00000000-0000-0000-0000-000000000001','final_exam',  'B',  'Final Exam -- Form B (Secure)', 3, 75, 120, true, 1, false)
 on conflict (id) do nothing;
@@ -147,15 +74,15 @@ select
   q.id::uuid, '00000000-0000-0000-0000-000000000001', ch.id, q.stem, q.type,
   q.options::jsonb, q.correct::jsonb, q.expl, 'medium'
 from (values
-  ('00000000-0000-0000-0000-000000000301', 12,
+  ('00000000-0000-0000-0000-000000000301', 10,
    'When is a side pot created?', 'multiple_choice',
    '[{"key":"a","text":"Every hand"},{"key":"b","text":"When a player is all-in for less than a call"},{"key":"c","text":"Only in tournaments"}]',
    '"b"', 'A side pot forms when a player is all-in and others continue betting.'),
-  ('00000000-0000-0000-0000-000000000302', 12,
+  ('00000000-0000-0000-0000-000000000302', 10,
    'The main pot can be won by any player still in the hand.', 'true_false',
    '[{"key":"true","text":"True"},{"key":"false","text":"False"}]',
    '"true"', 'All contesting players are eligible for the main pot.'),
-  ('00000000-0000-0000-0000-000000000303', 12,
+  ('00000000-0000-0000-0000-000000000303', 10,
    'Name the chip the dealer uses to protect the deck between hands.', 'short_answer',
    '[]', '["cut card","cutting card"]', 'The cut card protects the bottom of the deck.')
 ) as q(id, chnum, stem, type, options, correct, expl)

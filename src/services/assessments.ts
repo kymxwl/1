@@ -120,6 +120,24 @@ export async function submitAndGrade(
   return data;
 }
 
+/**
+ * Grade an instructor-scored written exam (e.g. Appendix L). `marks` maps each
+ * question id to a 0..1 point; the server computes the score. The auto-grader
+ * (submitAndGrade) refuses these exams, so this is the grading path for them.
+ * Callable by the proctor, the cohort instructor, or an admin.
+ */
+export async function gradeWrittenAttempt(
+  attemptId: string,
+  marks: Record<string, number>,
+): Promise<number> {
+  const { data, error } = await supabase.rpc('grade_written_attempt', {
+    p_attempt_id: attemptId,
+    p_marks: marks as never,
+  });
+  if (error) throw error;
+  return (data as number) ?? 0;
+}
+
 /** Attempt history for a student's progress screen. */
 export async function getAttemptHistory(enrollmentId: string): Promise<AssessmentAttempt[]> {
   const { data, error } = await supabase

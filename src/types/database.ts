@@ -12,7 +12,7 @@ export type AttendanceStatus =
   | 'present' | 'absent' | 'tardy' | 'excused' | 'left_early';
 export type CompletionOutcome =
   | 'not_eligible' | 'completed' | 'completed_with_distinction';
-export type AssessmentKind = 'chapter_quiz' | 'practice' | 'final_exam';
+export type AssessmentKind = 'chapter_quiz' | 'practice' | 'final_exam' | 'final_practical';
 export type QuestionType = 'multiple_choice' | 'true_false' | 'short_answer';
 
 type Json = string | number | boolean | null | { [k: string]: Json } | Json[];
@@ -167,6 +167,7 @@ export interface Database {
     Functions: {
       clock_hours_for: { Args: { p_enrollment_id: string }; Returns: number };
       grade_attempt: { Args: { p_attempt_id: string }; Returns: number };
+      grade_written_attempt: { Args: { p_attempt_id: string; p_marks: Json }; Returns: number };
       evaluate_completion: { Args: { p_enrollment_id: string }; Returns: string };
       issue_certificate: {
         Args: { p_completion_evaluation_id: string; p_issued_by?: string };
@@ -180,6 +181,7 @@ export interface Database {
         Returns: string;
       };
       current_app_role: { Args: Record<string, never>; Returns: AppRole };
+      set_user_role: { Args: { p_user_id: string; p_role: AppRole }; Returns: undefined };
       attempt_feedback: { Args: { p_attempt_id: string }; Returns: Json };
       generate_cohort_sessions: {
         Args: {
