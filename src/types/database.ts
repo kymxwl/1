@@ -72,6 +72,7 @@ export interface Assessment {
   form_code: 'A' | 'B' | null; title: string; question_count: number;
   passing_score: number; time_limit_minutes: number | null;
   is_secure: boolean; max_attempts: number; randomize_order: boolean;
+  grading: 'auto' | 'manual';
 }
 export interface AssessmentAttempt {
   id: string; enrollment_id: string; assessment_id: string;
@@ -150,7 +151,7 @@ export interface Database {
       assessment_attempts: TableDef<
         AssessmentAttempt,
         Pick<AssessmentAttempt, 'enrollment_id' | 'assessment_id' | 'attempt_number' | 'responses'> &
-          Partial<Pick<AssessmentAttempt, 'proctored_by' | 'started_at'>>
+          Partial<Pick<AssessmentAttempt, 'proctored_by' | 'started_at' | 'submitted_at'>>
       >;
       flashcards: TableDef<Flashcard>;
       practical_categories: TableDef<PracticalCategory>;

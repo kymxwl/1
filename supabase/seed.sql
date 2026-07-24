@@ -41,6 +41,9 @@ insert into payment_records (student_id, pathway, is_approved) values
 -- Ch 25 Final Practical Examination (nine categories, composite >= 80%).
 \ir content/practical_exam_2026_1.sql
 
+-- Appendix C — Hand Reading Workbook (50 self-check flashcards, Ch 20).
+\ir content/hand_reading_workbook_2026_1.sql
+
 -- A couple of student-visible resources.
 insert into resources (owner_type, owner_id, kind, title, url, visibility)
 select 'chapter', ch.id, 'flashcards', ch.title || ' Flash Cards',

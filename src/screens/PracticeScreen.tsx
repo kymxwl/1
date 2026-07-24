@@ -14,12 +14,13 @@ import QuizScreen from '@/screens/QuizScreen';
  * quiz. Wired to the seeded chapter-12 content; in production the chapter is
  * chosen from the outline.
  */
-type View_ = 'menu' | 'flashcards' | 'quiz';
+type View_ = 'menu' | 'flashcards' | 'quiz' | 'handreading';
 
 export default function PracticeScreen() {
   const [view, setView] = useState<View_>('menu');
   const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
   const [chapterId, setChapterId] = useState<string | null>(null);
+  const [handReadingChapterId, setHandReadingChapterId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,17 +29,17 @@ export default function PracticeScreen() {
       try {
         const enr = await getMyActiveEnrollment();
         setEnrollmentId(enr?.id ?? null);
-        // Resolve the chapter id for the demo flashcard chapter number.
         const { data: courses } = await supabase
           .from('courses').select('id').eq('program_id', DEMO.programId);
         const courseIds = (courses ?? []).map((c) => c.id);
         if (courseIds.length > 0) {
-          const { data: ch } = await supabase
-            .from('chapters').select('id')
+          const { data: chs } = await supabase
+            .from('chapters').select('id, number')
             .in('course_id', courseIds)
-            .eq('number', DEMO.flashcardChapterNumber)
-            .maybeSingle();
-          setChapterId(ch?.id ?? null);
+            .in('number', [DEMO.flashcardChapterNumber, DEMO.handReadingChapterNumber]);
+          const byNum = new Map((chs ?? []).map((c) => [c.number, c.id]));
+          setChapterId(byNum.get(DEMO.flashcardChapterNumber) ?? null);
+          setHandReadingChapterId(byNum.get(DEMO.handReadingChapterNumber) ?? null);
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
@@ -53,6 +54,9 @@ export default function PracticeScreen() {
   if (view === 'flashcards' && chapterId) {
     return <Framed title="Flash Cards" onBack={() => setView('menu')}><FlashcardScreen chapterId={chapterId} /></Framed>;
   }
+  if (view === 'handreading' && handReadingChapterId) {
+    return <Framed title="Hand Reading Drills" onBack={() => setView('menu')}><FlashcardScreen chapterId={handReadingChapterId} /></Framed>;
+  }
   if (view === 'quiz' && enrollmentId) {
     return <Framed title="Quiz" onBack={() => setView('menu')}><QuizScreen assessmentId={DEMO.chapterQuiz} enrollmentId={enrollmentId} /></Framed>;
   }
@@ -65,6 +69,10 @@ export default function PracticeScreen() {
       <Pressable style={s.btn} onPress={() => setView('flashcards')} disabled={!chapterId}>
         <Text style={s.btnLabel}>🃏 Flash cards</Text>
         <Text style={s.btnHint}>{chapterId ? 'Drill the deck' : 'No deck available'}</Text>
+      </Pressable>
+      <Pressable style={s.btn} onPress={() => setView('handreading')} disabled={!handReadingChapterId}>
+        <Text style={s.btnLabel}>🂡 Hand reading drills</Text>
+        <Text style={s.btnHint}>{handReadingChapterId ? '50 self-check hands (Appendix C)' : 'No deck available'}</Text>
       </Pressable>
       <Pressable style={s.btn} onPress={() => setView('quiz')} disabled={!enrollmentId}>
         <Text style={s.btnLabel}>📝 Practice quiz</Text>

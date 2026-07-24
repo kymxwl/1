@@ -1,0 +1,78 @@
+-- =============================================================================
+-- content/hand_reading_workbook_2026_1.sql
+-- Appendix C — Hand Reading Workbook (50 practice hands), from TGI Manual v1.
+--
+-- Loaded as a SELF-CHECK FLASHCARD deck under Ch 20 (Professional Hand Reading
+-- Drills): front = the hand scenario + question, back = the manual's answer.
+-- The manual frames this as a self-check workbook ("cover the answer key and
+-- attempt every hand before checking"), so it is study content, not a graded
+-- exam.
+--
+-- NOTE (data quality): several answer-key entries in the source contain the
+-- author's working-out with self-corrections (e.g. "A wins: ... B wins."). The
+-- text is reproduced VERBATIM from the manual and NOT machine-normalized — the
+-- institute should review/clean the answer key. That is also why this loads as
+-- a self-check deck rather than an auto-graded quiz (no reliable machine key).
+--
+-- Idempotent (deterministic ids). \ir-included by seed.sql.
+-- =============================================================================
+
+\set course_id '''00000000-0000-0000-0000-000000000010'''
+
+insert into flashcards (id, chapter_id, front, back, sequence, is_active)
+select v.id::uuid, ch.id, v.front, v.back, v.seq, true
+from (values
+  ('00000000-0000-0000-0000-0000000c0001', '[Tier 1 · Hold''em] Hold''em — Board K♠ K♦ 7♣ 4♥ 2♠; A holds K♣ Q♠; B holds A♥ A♣  Who wins?', 'A wins: trip Kings beats two pair (Aces & Kings... B has KK+AA two pair). A: KKK; B: AA KK. Trips beat two pair — A wins.', 1),
+  ('00000000-0000-0000-0000-0000000c0002', '[Tier 1 · Hold''em] Hold''em — Board 9♠ 8♠ 7♠ 2♦ 2♣; A holds A♠ 3♠; B holds 9♥ 9♦  Who wins?', 'A wins: Ace-high flush beats B''s set of nines.', 2),
+  ('00000000-0000-0000-0000-0000000c0003', '[Tier 1 · Hold''em] Hold''em — Board Q♦ J♣ 10♥ 4♠ 2♣; A holds A♠ K♦; B holds Q♣ Q♠  Who wins?', 'A wins: Broadway straight (A-K-Q-J-10) beats set of Queens.', 3),
+  ('00000000-0000-0000-0000-0000000c0004', '[Tier 1 · Hold''em] Hold''em — Board 5♣ 5♦ 5♠ K♥ 2♣; A holds K♣ Q♠; B holds 6♠ 6♥  Who wins?', 'A wins: fives full of Kings beats fives full of sixes? A: 555KK; B: 555 66 → fives full of Kings beats fives full of sixes — A wins.', 4),
+  ('00000000-0000-0000-0000-0000000c0005', '[Tier 1 · Hold''em] Hold''em — Board A♦ K♣ Q♥ J♠ 9♠; A holds 10♠ 2♣; B holds A♣ A♠  Who wins?', 'A wins: A-K-Q-J-10 straight beats trip Aces.', 5),
+  ('00000000-0000-0000-0000-0000000c0006', '[Tier 1 · Hold''em] Hold''em — Board 8♥ 8♦ 4♣ 4♠ K♥; A holds A♠ 8♠; B holds K♣ K♦  Who wins?', 'A wins: eights full of fours? A: 888 44 → eights full of fours; B: KKK 88? B has KKK + 88 → Kings full of eights. B wins.', 6),
+  ('00000000-0000-0000-0000-0000000c0007', '[Tier 1 · Hold''em] Hold''em — Board J♠ 10♠ 9♠ 2♦ 3♣; A holds Q♠ 8♠; B holds A♠ 4♣  Who wins?', 'A wins: Queen-high straight flush (Q-J-10-9-8 all spades) beats B''s nut spade flush.', 7),
+  ('00000000-0000-0000-0000-0000000c0008', '[Tier 1 · Hold''em] Hold''em — Board 7♣ 7♦ 7♠ K♥ K♠; A holds 7♥ 2♣; B holds K♣ Q♠  Who wins?', 'A wins: quad sevens beats B''s Kings full.', 8),
+  ('00000000-0000-0000-0000-0000000c0009', '[Tier 1 · Hold''em] Hold''em — Board A♥ K♥ 5♦ 5♣ 9♠; A holds A♠ K♣; B holds 9♥ 9♦  Who wins?', 'A wins: Aces & Kings two pair? A: AA KK 9; B: 999 55. Set of nines? B has 99+55 → nines full? No: 9-9-9-5-5 = nines full of fives. B wins.', 9),
+  ('00000000-0000-0000-0000-0000000c0010', '[Tier 1 · Hold''em] Hold''em — Board 2♣ 3♣ 4♣ 5♣ 9♠; A holds 6♣ K♠; B holds A♣ 10♠  Who wins?', 'B wins: Ace-high club flush beats A''s six-high straight flush? A has 2-3-4-5-6 all clubs = straight flush. A wins.', 10),
+  ('00000000-0000-0000-0000-0000000c0011', '[Tier 1 · Hold''em] Hold''em — Board K♠ Q♦ 7♥ 7♣ K♦; A holds K♣ 5♠; B holds Q♣ Q♠  Who wins?', 'A wins: Kings full of sevens beats Queens full of sevens? B: QQQ 77 → Queens full of sevens; A: KKK 77 → Kings full. A wins.', 11),
+  ('00000000-0000-0000-0000-0000000c0012', '[Tier 1 · Hold''em] Hold''em — Board 10♦ 10♣ 9♠ 9♥ 2♣; A holds A♠ 10♠; B holds 9♣ K♠  Who wins?', 'A wins: tens full of nines beats nines full of tens.', 12),
+  ('00000000-0000-0000-0000-0000000c0013', '[Tier 1 · Hold''em] Hold''em — Board A♠ 7♦ 7♠ 7♣ 2♥; A holds A♣ K♠; B holds 7♥ 4♣  Who wins?', 'B wins: quad sevens beats A''s sevens full of Aces.', 13),
+  ('00000000-0000-0000-0000-0000000c0014', '[Tier 1 · Hold''em] Hold''em — Board J♥ J♣ J♠ 4♦ 4♣; A holds J♦ 2♠; B holds A♥ A♠  Who wins?', 'A wins: quad Jacks beats B''s Aces full of Jacks.', 14),
+  ('00000000-0000-0000-0000-0000000c0015', '[Tier 1 · Hold''em] Hold''em — Board 6♠ 7♠ 8♠ 9♠ 2♥; A holds 10♠ 3♣; B holds 5♠ 4♣  Who wins?', 'A wins: ten-high straight flush beats B''s nine-high straight flush.', 15),
+  ('00000000-0000-0000-0000-0000000c0016', '[Tier 1 · Hold''em] Hold''em — Board K♣ 7♦ 2♠ 2♣ 2♥; A holds K♠ Q♠; B holds A♠ 7♣  Who wins?', 'A wins: Kings full of deuces? A: 222 KK; B: 222 77. Both trips of deuces, A''s pair higher → A wins.', 16),
+  ('00000000-0000-0000-0000-0000000c0017', '[Tier 1 · Hold''em] Hold''em — Board A♠ A♦ K♥ K♣ Q♠; A holds A♣ 2♠; B holds K♠ J♣  Who wins?', 'A wins: trip Aces full of Kings beats B''s Kings full of Aces.', 17),
+  ('00000000-0000-0000-0000-0000000c0018', '[Tier 1 · Hold''em] Hold''em — Board 3♥ 3♣ 6♦ 6♣ 6♠; A holds 3♠ K♠; B holds 6♥ A♣  Who wins?', 'B wins: quad sixes beats A''s sixes full of threes.', 18),
+  ('00000000-0000-0000-0000-0000000c0019', '[Tier 2 · Omaha] Omaha — Board A♠ K♠ Q♠ J♠ 2♥; Player holds 10♠ 9♠ 4♣ 3♦  Best hand? Does a flush play?', 'Must use exactly two hole cards. Player has only one spade pair option: 10♠ 9♠ + three board spades = K-Q-J-10-9 spade flush? Uses 10♠ 9♠ + A♠ K♠ Q♠ → A-K-Q-10-9 spade flush. Yes, flush plays.', 19),
+  ('00000000-0000-0000-0000-0000000c0020', '[Tier 2 · Omaha] Omaha — Board 8♥ 8♦ 8♠ K♣ 2♠; Player holds 8♣ A♠ K♠ 5♦  Best hand?', 'Use 8♣ + one more: only one 8 in hand. Use 8♣ A♠ → with board 888 = quad eights (8♣ + 8-8-8 board) but must use exactly two hole + three board. Two hole: 8♣ K♠ + 8-8-K board = eights full of Kings? Best: 8♣ + A♠ with 8-8-8 → not legal (only one board 8 usable beyond). Quads: 8♣ (hole) + 8♠ 8♦ 8♥ (board=3) + need 2 hole → 8♣ A♠ + 8-8-8 = quad eights, Ace kicker.', 20),
+  ('00000000-0000-0000-0000-0000000c0021', '[Tier 2 · Omaha] Omaha — Board 9♦ 9♣ 4♠ 4♥ K♠; Player holds 9♠ 9♥ A♣ 2♦  Best hand?', 'Two hole 9♠ 9♥ + board 9-9-4? Only two board nines? Board has 9♦ 9♣. Use 9♠ 9♥ + 9♦? That''s three hole? No — two hole 9s + board 9 = trips plus... Use 9♠ 9♥ (hole) + 9♦ 4 4 (board) = nines full of fours.', 21),
+  ('00000000-0000-0000-0000-0000000c0022', '[Tier 2 · Omaha] Omaha — Board A♠ 5♦ 7♣ 9♥ 10♠; Player holds K♠ Q♠ J♣ 2♠  Does the player have a flush?', 'No. Only two board spades (A♠ 10♠). Two hole spades (K♠ Q♠ or 2♠) + two board spades = only four spades. No flush.', 22),
+  ('00000000-0000-0000-0000-0000000c0023', '[Tier 2 · Omaha] Omaha — Board 2♣ 3♣ 4♣ 5♦ 6♥; Player holds A♣ K♣ 7♠ 8♦  Best hand?', 'Straight: use 7♠... must use two hole. 7 from hole + 3-4-5-6? Only one 7 in hole (7♠) + need second hole: A♣ with 2-3-4-5 = A-2-3-4-5 wheel using A♣ + one more? Use A♣ + 7♠? Not connected. Best legal straight: use A♣ and a club? Flush needs 3 board clubs (2♣ 3♣ 4♣) + A♣ K♣ = A-K-4-3-2 club flush. Flush plays.', 23),
+  ('00000000-0000-0000-0000-0000000c0024', '[Tier 2 · Omaha] Omaha — Board K♦ K♣ 7♠ 7♥ 2♣; Player holds K♠ A♦ Q♣ J♠  Best hand?', 'Use K♠ + one hole + board K-K-7 = trip Kings? Two hole: K♠ A♦ + K-K-7 = Kings full of sevens.', 24),
+  ('00000000-0000-0000-0000-0000000c0025', '[Tier 2 · Omaha] Omaha — Board 10♥ J♥ Q♥ 2♣ 3♦; Player holds A♥ K♥ 4♠ 5♠  Best hand?', 'A♥ K♥ (two hole) + 10♥ J♥ Q♥ (board) = A-K-Q-J-10 royal flush in hearts.', 25),
+  ('00000000-0000-0000-0000-0000000c0026', '[Tier 2 · Omaha] Omaha — Board 6♠ 6♦ 6♣ K♥ K♠; Player holds 6♥ A♠ Q♣ J♦  Best hand?', '6♥ (hole) + need two hole: 6♥ A♠ + 6-6-K = sixes... use 6♥ + A♠ with board 6-6-K → quad sixes (6♥ + 6♠ 6♦ 6♣) needs only one hole 6 + ... exactly two hole: 6♥ A♠ + 6♦ 6♣ K = quad sixes, Ace kicker.', 26),
+  ('00000000-0000-0000-0000-0000000c0027', '[Tier 2 · Omaha] Omaha — Board A♦ A♣ K♠ K♣ 5♥; Player holds A♠ A♥ 2♣ 3♦  Best hand?', 'A♠ A♥ (hole) + A♦ ... only board has A♦ A♣. Two hole Aces + one board Ace = quad Aces? Use A♠ A♥ + A♦ A♣ K = quad Aces, King kicker.', 27),
+  ('00000000-0000-0000-0000-0000000c0028', '[Tier 2 · Omaha] Omaha — Board Q♣ J♠ 9♦ 8♥ 2♣; Player holds 10♠ 10♥ A♠ K♣  Best hand?', '10♠ (hole) + need second hole for straight: use 10♥ + Q J 9 8? 10 fills Q-J-10-9-8. Use 10♠ 10♥? Only need one 10. Use 10♠ + K♣? Not straight. Use 10 + any: 10♠ A♠ doesn''t help. Best straight uses 10 + one card making Q-J-10-9-8: that requires only the single 10 from hole + a second hole card in the run. No second hole card connects. So pair of tens only? Actually Q-J-_-9-8 needs a 10; player has 10s but must pick a 2nd hole card from {A,K} → no straight. Best = pair of tens.', 28),
+  ('00000000-0000-0000-0000-0000000c0029', '[Tier 2 · Omaha] Omaha — Board 7♣ 8♣ 9♣ 2♦ 2♠; Player holds 10♣ J♣ A♠ K♥  Best hand?', '10♣ J♣ (hole) + 7♣ 8♣ 9♣ (board) = J-10-9-8-7 straight flush in clubs.', 29),
+  ('00000000-0000-0000-0000-0000000c0030', '[Tier 2 · Omaha] Omaha — Board A♠ K♥ Q♦ 5♣ 5♠; Player holds 5♥ 5♦ A♣ K♣  Best hand?', '5♥ 5♦ (hole) + 5♣ 5♠ (board) = quad fives, Ace kicker.', 30),
+  ('00000000-0000-0000-0000-0000000c0031', '[Tier 2 · Omaha] Omaha — Board 3♠ 4♠ 5♠ 6♦ 7♣; Player holds 2♠ A♠ K♦ Q♣  Flush or straight?', '2♠ A♠ (hole) + 3♠ 4♠ 5♠ (board) = A-5-4-3-2 spade flush. Straight 7-6-5-4-3 needs two hole in run — player lacks them. Flush plays.', 31),
+  ('00000000-0000-0000-0000-0000000c0032', '[Tier 2 · Omaha] Omaha — Board 10♦ 10♣ J♥ J♠ A♣; Player holds J♣ J♦ 2♠ 3♥  Best hand?', 'J♣ J♦ (hole) + J♥ J♠ (board) = quad Jacks, Ace kicker.', 32),
+  ('00000000-0000-0000-0000-0000000c0033', '[Tier 2 · Omaha] Omaha — Board K♣ Q♣ J♣ 10♠ 9♠; Player holds A♣ 10♣ 2♦ 3♥  Best hand?', 'A♣ 10♣ (hole) + K♣ Q♣ J♣ (board) = A-K-Q-J-10 royal flush in clubs.', 33),
+  ('00000000-0000-0000-0000-0000000c0034', '[Tier 2 · Omaha] Omaha — Board 4♥ 4♦ 9♣ 9♠ 9♥; Player holds 9♦ A♠ K♣ Q♦  Best hand?', '9♦ A♠ (hole) + 9-9-9 board? Two hole + three board: 9♦ + one hole + 9♠ 9♥ 4 → quad nines needs 9♦ + 9♣ 9♠ 9♥ (that''s one hole + three board = 4 cards, only one hole) illegal. Legal: 9♦ A♠ + 9♣ 9♠ 9♥? that''s two hole + three board = 9♦(hole) A♠(hole) + 9♣ 9♠ 9♥ (board) = quad nines, Ace kicker.', 34),
+  ('00000000-0000-0000-0000-0000000c0035', '[Tier 3 · Big O, Side Pots & Odd Chips] Big O — Board A♦ 2♣ 7♥ 9♠ K♣; Player holds 3♦ 4♠ 5♣ 8♥ J♠  Does a low qualify? Best low?', 'Yes. Use 3♦ 4♠ (hole) + A 2 7 (board) = A-2-3-4-7 → seven-low. Qualifies (eight-or-better).', 35),
+  ('00000000-0000-0000-0000-0000000c0036', '[Tier 3 · Big O, Side Pots & Odd Chips] Big O — Board 5♠ 6♦ 7♣ 8♥ K♠; Player holds A♣ 2♠ 9♥ 10♦ J♣  Best high and qualifying low?', 'High: 9-10 + 5-6-7-8? Use 9♥ 10♦ + 6 7 8 = 10-9-8-7-6 straight. Low: A♣ 2♠ + 5 6 7 = A-2-5-6-7 → seven-low qualifies.', 36),
+  ('00000000-0000-0000-0000-0000000c0037', '[Tier 3 · Big O, Side Pots & Odd Chips] Big O — Board 2♦ 3♣ 4♥ J♠ Q♣; Player holds A♠ 5♣ 6♦ K♥ K♣  Best low?', 'A♠ 5♣ (hole) + 2 3 4 (board) = A-2-3-4-5 = wheel (five-low), the best possible low.', 37),
+  ('00000000-0000-0000-0000-0000000c0038', '[Tier 3 · Big O, Side Pots & Odd Chips] Big O — Board 8♠ 9♠ 10♠ 2♣ 3♦; Player holds A♠ 4♠ 5♦ 6♥ 7♣  High and low?', 'High: A♠ 4♠ + 8♠ 9♠ 10♠ = A-10-9-8-4 spade flush. Low: 4 5 + ... use two hole low + 8/9/10? board lows are only 2,3. Low needs three board cards eight-or-lower: only 2,3 qualify → no qualifying low. High scoops.', 38),
+  ('00000000-0000-0000-0000-0000000c0039', '[Tier 3 · Big O, Side Pots & Odd Chips] Big O — Board A♣ 4♦ 5♣ 6♥ 8♠; Player A holds 2♠ 3♠ K♥ Q♦ J♣; Player B holds 2♦ 7♣ 9♠ 10♥ K♣  Who has the better low?', 'A: 2♠ 3♠ + A 4 5 = A-2-3-4-5 wheel (five-low). B: 2♦ 7♣ + A 4 5 = A-2-4-5-7 seven-low. A wins low (wheel beats seven-low).', 39),
+  ('00000000-0000-0000-0000-0000000c0040', '[Tier 3 · Big O, Side Pots & Odd Chips] Side Pots — A all-in $50; B all-in $150; C all-in $400  Build the pots.', 'Main: 50×3 = $150 (A,B,C). Side 1: 100×2 = $200 (B,C). C''s extra $250 returned. Total wagered in pots: $350 + $250 returned.', 40),
+  ('00000000-0000-0000-0000-0000000c0041', '[Tier 3 · Big O, Side Pots & Odd Chips] Side Pots — A all-in $80; B all-in $80; C bets $200 (covers)  Build the pots.', 'Main: 80×3 = $240 (A,B,C). C''s extra $120 returned (no opponent). Side pot: none.', 41),
+  ('00000000-0000-0000-0000-0000000c0042', '[Tier 3 · Big O, Side Pots & Odd Chips] Side Pots — A all-in $100; B all-in $250; C all-in $250  Build the pots.', 'Main: 100×3 = $300 (A,B,C). Side 1: 150×2 = $300 (B,C). No chips returned.', 42),
+  ('00000000-0000-0000-0000-0000000c0043', '[Tier 3 · Big O, Side Pots & Odd Chips] Side Pots — A $500; B all-in $120; C all-in $300; D folds preflop having posted $20 BB  Build the pots including the dead blind.', 'Dead $20 goes to main. Main: 120×3 +20 = $380 (A,B,C). Side 1: (300-120)×2 = $360 (A,C). Side 2: A''s extra $200 returned.', 43),
+  ('00000000-0000-0000-0000-0000000c0044', '[Tier 3 · Big O, Side Pots & Odd Chips] Odd Chips — Split pot $325 between high (A) and low (B); chips are $1  Divide and place the odd chip.', '$325 / 2 = $162.50. High receives the odd chip: A $163, B $162. Verify: 163+162 = 325.', 44),
+  ('00000000-0000-0000-0000-0000000c0045', '[Tier 3 · Big O, Side Pots & Odd Chips] Odd Chips — Quartered low: B and C tie for low half of a $400 pot; A wins high  Distribute.', 'High half $200 to A. Low half $200 split B/C = $100 each. If indivisible, odd chip to the high-side or first seat left of button per house rule.', 45),
+  ('00000000-0000-0000-0000-0000000c0046', '[Tier 3 · Big O, Side Pots & Odd Chips] Odd Chips — Three-way high tie for a $301 pot, $1 chips  Distribute.', '$301 / 3 = $100 remainder 1. Each gets $100; odd chip to the first eligible seat left of the button.', 46),
+  ('00000000-0000-0000-0000-0000000c0047', '[Tier 3 · Big O, Side Pots & Odd Chips] Big O — Board A♥ 2♥ 3♥ 4♥ 5♥; Player A holds 6♥ 7♠ K♣ Q♦ J♠; Player B holds A♠ 2♠ 8♣ 9♦ 10♥  High and low results?', 'High: A plays 6♥ + one heart? Two hole + three board hearts: 6♥ needs a 2nd heart hole — none → no flush for A. B: A♠ 2♠ + 3♥ 4♥ 5♥? not a flush (mixed). Board is a 5-high straight flush in hearts but each player must use exactly two hole cards, so the board straight flush does NOT play by itself. Read carefully per two-card rule.', 47),
+  ('00000000-0000-0000-0000-0000000c0048', '[Tier 3 · Big O, Side Pots & Odd Chips] Big O — Board 7♣ 8♦ 9♠ 2♥ 3♣; Player holds A♠ 4♣ 5♦ 6♥ 10♣  Best high and low?', 'High: 5♦ 6♥ + 7 8 9 = 9-8-7-6-5 straight. Low: A♠ 4♣ + 7 2 3 = A-2-3-4-7 seven-low qualifies.', 48),
+  ('00000000-0000-0000-0000-0000000c0049', '[Tier 3 · Big O, Side Pots & Odd Chips] Side Pots — A all-in $30; B all-in $30; C all-in $30  Build the pots.', 'Single main pot: 30×3 = $90 (A,B,C). No side pots; equal all-ins.', 49),
+  ('00000000-0000-0000-0000-0000000c0050', '[Tier 3 · Big O, Side Pots & Odd Chips] Odd Chips — Scoop check: Player A has the nut high and the nut low in a $500 pot  Distribute.', 'A scoops — receives the entire $500 (best high and best qualifying low). No split.', 50)
+) as v(id, front, back, seq)
+cross join (select id from chapters where number = 20 and course_id = :course_id) ch
+on conflict (id) do update
+  set front = excluded.front, back = excluded.back, sequence = excluded.sequence, chapter_id = excluded.chapter_id;
