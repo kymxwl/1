@@ -37,7 +37,8 @@ export interface Lesson {
 export interface Resource {
   id: string; owner_type: 'program' | 'course' | 'chapter' | 'lesson';
   owner_id: string; kind: 'deck' | 'flashcards' | 'video' | 'handout' | 'manual';
-  title: string; url: string; visibility: 'student' | 'instructor' | 'admin';
+  title: string; url: string | null; body: string | null;
+  visibility: 'student' | 'instructor' | 'admin';
 }
 export interface Session {
   id: string; cohort_id: string; session_date: string;

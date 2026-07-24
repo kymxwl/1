@@ -48,7 +48,7 @@ export default function CourseOutlineScreen({ programId }: { programId: string }
           {section.resources.length > 0 && (
             <View style={s.resourceRow}>
               {section.resources.map((r) => (
-                <Pressable key={r.id} style={s.chip} onPress={() => void Linking.openURL(r.url)}>
+                <Pressable key={r.id} style={s.chip} onPress={() => r.url && void Linking.openURL(r.url)}>
                   <Text style={s.chipText}>{r.kind === 'flashcards' ? '🃏' : '📄'} {r.title}</Text>
                 </Pressable>
               ))}

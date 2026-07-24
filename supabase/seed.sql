@@ -47,6 +47,9 @@ insert into payment_records (student_id, pathway, is_approved) values
 -- Appendix A (glossary) + Appendix B (quick-reference charts) as study cards.
 \ir content/reference_2026_1.sql
 
+-- Presentational sections (TGI Standard, oaths, instructor forms) as resources.
+\ir content/handbook_2026_1.sql
+
 -- A couple of student-visible resources.
 insert into resources (owner_type, owner_id, kind, title, url, visibility)
 select 'chapter', ch.id, 'flashcards', ch.title || ' Flash Cards',
