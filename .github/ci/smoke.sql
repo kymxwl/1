@@ -188,6 +188,9 @@ begin
   if qcount <> 100 then
     raise exception 'SMOKE FAIL: Appendix L exam has % questions, expected 100', qcount;
   end if;
+  if (select grading from assessments where id = '00000000-0000-0000-0000-000000000204') <> 'manual' then
+    raise exception 'SMOKE FAIL: Appendix L exam is not marked manual-graded';
+  end if;
 
   -- Proctored attempt on the written final for Sam (…501).
   insert into assessment_attempts (id, enrollment_id, assessment_id, attempt_number, proctored_by, responses)

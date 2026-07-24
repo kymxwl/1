@@ -127,12 +127,13 @@ on conflict (id) do update
       correct_answer = excluded.correct_answer, is_active = excluded.is_active;
 
 -- The written final instrument (Appendix L, Form A). Secure, manual-graded.
-insert into assessments (id, program_id, kind, form_code, title, question_count, passing_score, time_limit_minutes, is_secure, max_attempts, randomize_order)
+insert into assessments (id, program_id, kind, form_code, title, question_count, passing_score, time_limit_minutes, is_secure, max_attempts, randomize_order, grading)
 values ('00000000-0000-0000-0000-000000000204', :program_id, 'final_exam', 'A',
-        'Final Written Examination — Appendix L (100 Questions)', 100, 70, 120, true, 2, false)
+        'Final Written Examination — Appendix L (100 Questions)', 100, 70, 120, true, 2, false, 'manual')
 on conflict (id) do update
   set title = excluded.title, question_count = excluded.question_count,
-      passing_score = excluded.passing_score, is_secure = excluded.is_secure, max_attempts = excluded.max_attempts;
+      passing_score = excluded.passing_score, is_secure = excluded.is_secure,
+      max_attempts = excluded.max_attempts, grading = excluded.grading;
 
 -- Map all 100 questions to the exam in order.
 insert into assessment_questions (assessment_id, question_id, sequence)

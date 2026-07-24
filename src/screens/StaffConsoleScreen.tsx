@@ -9,13 +9,14 @@ import ReportingScreen from '@/screens/ReportingScreen';
 import CompletionScreen from '@/screens/CompletionScreen';
 import CohortAdminScreen from '@/screens/CohortAdminScreen';
 import PracticalExamScreen from '@/screens/PracticalExamScreen';
+import WrittenGradingScreen from '@/screens/WrittenGradingScreen';
 
 /**
  * Instructor / admin hub. Switches between the M3/M5/M6/M9 consoles, wired to
  * the seeded demo cohort. In production the target cohort/session/student comes
  * from live pickers rather than DEMO constants.
  */
-type View_ = 'menu' | 'attendance' | 'skill' | 'exam' | 'practical' | 'reporting' | 'completion' | 'cohorts';
+type View_ = 'menu' | 'attendance' | 'skill' | 'exam' | 'practical' | 'grading' | 'reporting' | 'completion' | 'cohorts';
 
 interface Props {
   profileId: string;
@@ -74,6 +75,13 @@ export default function StaffConsoleScreen({ profileId, displayName, role }: Pro
       </Framed>
     );
   }
+  if (view === 'grading') {
+    return (
+      <Framed title="Grade Written Exams" onBack={() => setView('menu')}>
+        <WrittenGradingScreen />
+      </Framed>
+    );
+  }
   if (view === 'reporting') {
     return (
       <Framed title="Reporting" onBack={() => setView('menu')}>
@@ -104,6 +112,7 @@ export default function StaffConsoleScreen({ profileId, displayName, role }: Pro
       <MenuButton label="Score a skill" hint="M6 · tier computed by the system" onPress={() => setView('skill')} />
       <MenuButton label="Proctor a secure exam" hint="M5 · server-side grading" onPress={() => setView('exam')} />
       <MenuButton label="Final practical exam" hint="Ch 25 · 9 categories, computed composite" onPress={() => setView('practical')} />
+      <MenuButton label="Grade written exams" hint="Appendix L · mark essays, computed score" onPress={() => setView('grading')} />
       {role === 'admin' && (
         <>
           <MenuButton label="Cohorts & scheduling" hint="M2 · create cohort, generate calendar, enrol" onPress={() => setView('cohorts')} />

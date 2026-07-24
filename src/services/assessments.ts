@@ -121,6 +121,72 @@ export async function submitAndGrade(
 }
 
 /**
+ * Submit a manual-graded exam (e.g. Appendix L written): write the attempt once
+ * with the student's responses and submitted_at, WITHOUT grading. An instructor
+ * grades it later via gradeWrittenAttempt. Returns the submitted attempt.
+ */
+export async function submitForManualGrading(
+  session: AttemptSession,
+  responses: Record<string, unknown>,
+): Promise<AssessmentAttempt> {
+  const { data, error } = await supabase
+    .from('assessment_attempts')
+    .insert({
+      enrollment_id: session.enrollmentId,
+      assessment_id: session.assessmentId,
+      attempt_number: session.attemptNumber,
+      started_at: session.startedAt,
+      responses: responses as never,
+      proctored_by: session.proctoredBy,
+      submitted_at: new Date().toISOString(),
+    })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export interface GradingItem {
+  question: QuestionPublic;
+  response: string | null;
+}
+
+/** A submitted manual-graded attempt with its questions + the student's responses. */
+export async function getAttemptForGrading(
+  attemptId: string,
+): Promise<{ attempt: AssessmentAttempt; items: GradingItem[] }> {
+  const { data: attempt, error } = await supabase
+    .from('assessment_attempts').select('*').eq('id', attemptId).single();
+  if (error) throw error;
+  const questions = await getAssessmentQuestions(attempt.assessment_id);
+  const responses = (attempt.responses ?? {}) as Record<string, unknown>;
+  const items: GradingItem[] = questions.map((qn) => ({
+    question: qn,
+    response: responses[qn.id] != null ? String(responses[qn.id]) : null,
+  }));
+  return { attempt, items };
+}
+
+/** Ungraded, submitted attempts on manual-graded assessments (RLS-scoped). */
+export async function getUngradedAttempts(): Promise<AssessmentAttempt[]> {
+  const { data: manual, error: mErr } = await supabase
+    .from('assessments').select('id').eq('grading', 'manual');
+  if (mErr) throw mErr;
+  const ids = (manual ?? []).map((a) => a.id);
+  if (ids.length === 0) return [];
+  const { data, error } = await supabase
+    .from('assessment_attempts')
+    .select('*')
+    .in('assessment_id', ids)
+    .is('score', null)
+    .not('submitted_at', 'is', null)
+    .eq('void', false)
+    .order('submitted_at', { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
  * Grade an instructor-scored written exam (e.g. Appendix L). `marks` maps each
  * question id to a 0..1 point; the server computes the score. The auto-grader
  * (submitAndGrade) refuses these exams, so this is the grading path for them.

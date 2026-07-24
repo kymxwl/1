@@ -9,12 +9,12 @@
 \set program_id '''00000000-0000-0000-0000-000000000001'''
 
 -- The practical final. Composite >= 80% to graduate (per the manual).
-insert into assessments (id, program_id, kind, form_code, title, question_count, passing_score, time_limit_minutes, is_secure, max_attempts, randomize_order)
+insert into assessments (id, program_id, kind, form_code, title, question_count, passing_score, time_limit_minutes, is_secure, max_attempts, randomize_order, grading)
 values ('00000000-0000-0000-0000-000000000205', :program_id, 'final_practical', null,
-        'Final Practical Examination (Ch 25)', 0, 80, null, true, 2, false)
+        'Final Practical Examination (Ch 25)', 0, 80, null, true, 2, false, 'manual')
 on conflict (id) do update
   set title = excluded.title, passing_score = excluded.passing_score,
-      is_secure = excluded.is_secure, max_attempts = excluded.max_attempts;
+      is_secure = excluded.is_secure, max_attempts = excluded.max_attempts, grading = excluded.grading;
 
 -- The nine evaluation categories (scored 1..5; 5 = Exceptional, 1 = Fail).
 insert into practical_categories (program_id, key, name, standard, sequence)

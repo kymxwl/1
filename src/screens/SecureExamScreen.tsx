@@ -5,7 +5,7 @@ import {
 import { theme } from '@/theme';
 import {
   getAssessment, getAssessmentQuestions, beginAttempt, submitAndGrade,
-  type AttemptSession,
+  submitForManualGrading, type AttemptSession,
 } from '@/services/assessments';
 import type { Assessment, AssessmentAttempt, QuestionPublic } from '@/types/database';
 
@@ -52,8 +52,14 @@ export default function SecureExamScreen({
     setBusy(true);
     setError(null);
     try {
-      const graded = await submitAndGrade(session, responses);
-      setResult(graded);
+      if (assessment?.grading === 'manual') {
+        // Instructor-graded (e.g. Appendix L): submit responses, no score yet.
+        const submitted = await submitForManualGrading(session, responses);
+        setResult(submitted);
+      } else {
+        const graded = await submitAndGrade(session, responses);
+        setResult(graded);
+      }
       setPhase('submitted');
       setSecondsLeft(null);
     } catch (e) {
@@ -61,7 +67,7 @@ export default function SecureExamScreen({
     } finally {
       setBusy(false);
     }
-  }, [session, responses]);
+  }, [session, responses, assessment]);
   submitRef.current = doSubmit;
 
   // Countdown; auto-submit at zero.
@@ -168,7 +174,13 @@ export default function SecureExamScreen({
         </View>
       )}
 
-      {phase === 'submitted' && result && (
+      {phase === 'submitted' && result && result.score == null && (
+        <View style={[s.card, s.resultCard, { borderColor: theme.color.brass }]}>
+          <Text style={s.verdict}>Submitted</Text>
+          <Text style={s.subtle}>Awaiting instructor grading.</Text>
+        </View>
+      )}
+      {phase === 'submitted' && result && result.score != null && (
         <View style={[s.card, s.resultCard, { borderColor: result.passed ? theme.color.felt : theme.color.danger }]}>
           <Text style={s.subtle}>Result (graded server-side)</Text>
           <Text style={[s.score, { color: result.passed ? theme.color.felt : theme.color.danger }]}>
