@@ -83,6 +83,10 @@ export interface Flashcard {
   id: string; chapter_id: string; front: string; back: string;
   sequence: number; is_active: boolean;
 }
+export interface PracticalCategory {
+  id: string; program_id: string; key: string; name: string;
+  standard: string; max_score: number; sequence: number;
+}
 export interface Skill {
   id: string; program_id: string; name: string;
   category: string | null; sequence: number;
@@ -149,6 +153,7 @@ export interface Database {
           Partial<Pick<AssessmentAttempt, 'proctored_by' | 'started_at'>>
       >;
       flashcards: TableDef<Flashcard>;
+      practical_categories: TableDef<PracticalCategory>;
       skills: TableDef<Skill>;
       skill_benchmarks: TableDef<SkillBenchmark>;
       skill_evaluations: TableDef<
@@ -168,6 +173,7 @@ export interface Database {
       clock_hours_for: { Args: { p_enrollment_id: string }; Returns: number };
       grade_attempt: { Args: { p_attempt_id: string }; Returns: number };
       grade_written_attempt: { Args: { p_attempt_id: string; p_marks: Json }; Returns: number };
+      grade_practical_attempt: { Args: { p_attempt_id: string }; Returns: number };
       evaluate_completion: { Args: { p_enrollment_id: string }; Returns: string };
       issue_certificate: {
         Args: { p_completion_evaluation_id: string; p_issued_by?: string };

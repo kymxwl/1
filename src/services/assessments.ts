@@ -138,6 +138,59 @@ export async function gradeWrittenAttempt(
   return (data as number) ?? 0;
 }
 
+/** The nine practical-exam categories (Ch 25), ordered. */
+export async function getPracticalCategories(programId: string) {
+  const { data, error } = await supabase
+    .from('practical_categories')
+    .select('*')
+    .eq('program_id', programId)
+    .order('sequence');
+  if (error) throw error;
+  return data ?? [];
+}
+
+/**
+ * Score the Ch 25 practical exam. The instructor's per-category scores (1..5)
+ * and any automatic-failure flag are written once with the attempt; the server
+ * computes the composite and pass/fail (>= 80%, auto-fail overrides).
+ */
+export async function scorePracticalExam(params: {
+  enrollmentId: string;
+  assessmentId: string;
+  attemptNumber: number;
+  proctoredBy: string;
+  scores: Record<string, number>;
+  autoFail: boolean;
+  note?: string;
+}): Promise<AssessmentAttempt> {
+  const { data: inserted, error: insErr } = await supabase
+    .from('assessment_attempts')
+    .insert({
+      enrollment_id: params.enrollmentId,
+      assessment_id: params.assessmentId,
+      attempt_number: params.attemptNumber,
+      proctored_by: params.proctoredBy,
+      responses: {
+        practical_scores: params.scores,
+        auto_fail: params.autoFail,
+        note: params.note ?? null,
+      } as never,
+    })
+    .select('id')
+    .single();
+  if (insErr) throw insErr;
+
+  const { error: gErr } = await supabase.rpc('grade_practical_attempt', {
+    p_attempt_id: inserted.id,
+  });
+  if (gErr) throw gErr;
+
+  const { data, error } = await supabase
+    .from('assessment_attempts').select('*').eq('id', inserted.id).single();
+  if (error) throw error;
+  return data;
+}
+
 /** Attempt history for a student's progress screen. */
 export async function getAttemptHistory(enrollmentId: string): Promise<AssessmentAttempt[]> {
   const { data, error } = await supabase
