@@ -12,5 +12,6 @@ export const DEMO = {
   finalPractical: '00000000-0000-0000-0000-000000000205',
   chapterQuiz: '00000000-0000-0000-0000-000000000201',
   flashcardChapterNumber: 10,
+  handReadingChapterNumber: 20,
   scheduledMinutes: 240, // 4.00 scheduled clock hours
 } as const;
