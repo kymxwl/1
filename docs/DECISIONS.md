@@ -37,22 +37,37 @@ recomputes hours locally.
 ## Regular "completed" vs "not_eligible" (beyond Distinction)
 
 The spec defines Distinction literally but leaves the baseline implicit. Encoded
-in `evaluate_completion()`:
+in `evaluate_completion()`. **As of migration `..._completion_manual.sql` this
+follows TGI Manual v1** (Program Completion Requirements + Graduate Distinction),
+which supersedes the original spec §2.6 rule:
 
 ```
 completed :=
       clock_hours_earned >= program.total_clock_hours
-  AND a non-void final exam attempt passed (score >= passing_score)
-  AND every defined skill has a current tier (>= bronze)
+  AND a non-void WRITTEN exam attempt passed        (final_exam, pass 70%)
+  AND a non-void PRACTICAL exam attempt passed      (final_practical, pass 80%)
+  AND every defined skill current tier >= 'silver'
+  AND attendance_pct >= 90
 
-completed_with_distinction :=            -- strict superset (spec §2.6)
-      best_final_exam_score >= 93
+completed_with_distinction :=
+      written_best  >= 93
+  AND practical_best >= 93
   AND every skill current tier = 'gold'
-  AND perfect_attendance                  -- zero absences, zero tardies, zero excused
+  AND game_protection_failures = 0
+  AND perfect_attendance                  -- zero absences, tardies, excused
   AND clock_hours_earned >= program.total_clock_hours
 
 otherwise := not_eligible
 ```
 
-`criteria_snapshot` stores the literal inputs so the outcome is reproducible
-years later even if benchmarks or curriculum change.
+`criteria_snapshot` stores the literal inputs (including `rule_source =
+'TGI Manual v1'`) so the outcome is reproducible years later.
+
+**Attested gates NOT auto-decided.** The manual also requires *professional
+conduct*, *instructor completion sign-off*, and *verified competency in each
+game variant*. These need human attestation / additional modeling and are
+tracked in `docs/COMPLETION.md`; `evaluate_completion()` computes only the
+objective gates above. The practical-exam **instrument** (Ch 25 categories &
+scoring) and the game-protection-incident UI are likewise pending — the schema
+(`final_practical` kind, `game_protection_incidents` table) and the rule are in
+place now.

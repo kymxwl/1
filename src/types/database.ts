@@ -12,7 +12,7 @@ export type AttendanceStatus =
   | 'present' | 'absent' | 'tardy' | 'excused' | 'left_early';
 export type CompletionOutcome =
   | 'not_eligible' | 'completed' | 'completed_with_distinction';
-export type AssessmentKind = 'chapter_quiz' | 'practice' | 'final_exam';
+export type AssessmentKind = 'chapter_quiz' | 'practice' | 'final_exam' | 'final_practical';
 export type QuestionType = 'multiple_choice' | 'true_false' | 'short_answer';
 
 type Json = string | number | boolean | null | { [k: string]: Json } | Json[];

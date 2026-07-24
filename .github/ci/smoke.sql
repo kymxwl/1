@@ -223,3 +223,25 @@ begin
 
   raise notice 'SMOKE OK: written exam refuses auto-grade; grade_written_attempt computes 80%%';
 end$$;
+
+-- Completion (manual-aligned): evaluate_completion runs and, for the partially
+-- complete demo student, yields not_eligible; the snapshot cites the manual.
+do $$
+declare
+  ce   uuid;
+  row  completion_evaluations%rowtype;
+begin
+  ce := evaluate_completion('00000000-0000-0000-0000-000000000501');
+  select * into row from completion_evaluations where id = ce;
+  if row.outcome <> 'not_eligible' then
+    raise exception 'SMOKE FAIL: demo completion outcome %, expected not_eligible', row.outcome;
+  end if;
+  if (row.criteria_snapshot ->> 'rule_source') <> 'TGI Manual v1' then
+    raise exception 'SMOKE FAIL: completion snapshot missing manual rule_source';
+  end if;
+  -- The manual adds a practical-exam gate the demo student has not met.
+  if (row.criteria_snapshot ->> 'practical_passed')::boolean is not false then
+    raise exception 'SMOKE FAIL: expected practical_passed=false for demo student';
+  end if;
+  raise notice 'SMOKE OK: manual-aligned completion evaluates (demo -> not_eligible)';
+end$$;
