@@ -8,13 +8,14 @@ import SecureExamScreen from '@/screens/SecureExamScreen';
 import ReportingScreen from '@/screens/ReportingScreen';
 import CompletionScreen from '@/screens/CompletionScreen';
 import CohortAdminScreen from '@/screens/CohortAdminScreen';
+import PracticalExamScreen from '@/screens/PracticalExamScreen';
 
 /**
  * Instructor / admin hub. Switches between the M3/M5/M6/M9 consoles, wired to
  * the seeded demo cohort. In production the target cohort/session/student comes
  * from live pickers rather than DEMO constants.
  */
-type View_ = 'menu' | 'attendance' | 'skill' | 'exam' | 'reporting' | 'completion' | 'cohorts';
+type View_ = 'menu' | 'attendance' | 'skill' | 'exam' | 'practical' | 'reporting' | 'completion' | 'cohorts';
 
 interface Props {
   profileId: string;
@@ -61,6 +62,18 @@ export default function StaffConsoleScreen({ profileId, displayName, role }: Pro
       </Framed>
     );
   }
+  if (view === 'practical') {
+    return (
+      <Framed title="Practical Exam" onBack={() => setView('menu')}>
+        <PracticalExamScreen
+          programId={DEMO.programId}
+          enrollmentId={DEMO.enrollmentId}
+          assessmentId={DEMO.finalPractical}
+          proctorId={profileId}
+        />
+      </Framed>
+    );
+  }
   if (view === 'reporting') {
     return (
       <Framed title="Reporting" onBack={() => setView('menu')}>
@@ -90,6 +103,7 @@ export default function StaffConsoleScreen({ profileId, displayName, role }: Pro
       <MenuButton label="Take attendance" hint="M3 · offline-tolerant" onPress={() => setView('attendance')} />
       <MenuButton label="Score a skill" hint="M6 · tier computed by the system" onPress={() => setView('skill')} />
       <MenuButton label="Proctor a secure exam" hint="M5 · server-side grading" onPress={() => setView('exam')} />
+      <MenuButton label="Final practical exam" hint="Ch 25 · 9 categories, computed composite" onPress={() => setView('practical')} />
       {role === 'admin' && (
         <>
           <MenuButton label="Cohorts & scheduling" hint="M2 · create cohort, generate calendar, enrol" onPress={() => setView('cohorts')} />

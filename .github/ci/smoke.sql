@@ -245,3 +245,38 @@ begin
   end if;
   raise notice 'SMOKE OK: manual-aligned completion evaluates (demo -> not_eligible)';
 end$$;
+
+-- Practical exam (Ch 25): composite computed from per-category 1..5 scores;
+-- an automatic-failure flag fails regardless of composite.
+do $$
+declare
+  score numeric;
+  passed boolean;
+begin
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
+
+  -- All nine categories = 5  ->  composite 100, passed.
+  insert into assessment_attempts (id, enrollment_id, assessment_id, attempt_number, proctored_by, responses)
+  values ('00000000-0000-0000-0000-00000000e205','00000000-0000-0000-0000-000000000501',
+          '00000000-0000-0000-0000-000000000205', 1, '00000000-0000-0000-0000-0000000000b1',
+          jsonb_build_object('practical_scores', (
+             select jsonb_object_agg(key, 5) from practical_categories
+             where program_id='00000000-0000-0000-0000-000000000001'), 'auto_fail', false));
+  score := grade_practical_attempt('00000000-0000-0000-0000-00000000e205');
+  if score <> 100.00 then raise exception 'SMOKE FAIL: practical composite %, expected 100', score; end if;
+  select assessment_attempts.passed into passed from assessment_attempts where id='00000000-0000-0000-0000-00000000e205';
+  if passed is not true then raise exception 'SMOKE FAIL: all-5 practical not passed'; end if;
+
+  -- All 5s but auto_fail = true  ->  composite 100 yet NOT passed.
+  insert into assessment_attempts (id, enrollment_id, assessment_id, attempt_number, proctored_by, responses)
+  values ('00000000-0000-0000-0000-00000000e206','00000000-0000-0000-0000-000000000502',
+          '00000000-0000-0000-0000-000000000205', 1, '00000000-0000-0000-0000-0000000000b1',
+          jsonb_build_object('practical_scores', (
+             select jsonb_object_agg(key, 5) from practical_categories
+             where program_id='00000000-0000-0000-0000-000000000001'), 'auto_fail', true));
+  perform grade_practical_attempt('00000000-0000-0000-0000-00000000e206');
+  select assessment_attempts.passed into passed from assessment_attempts where id='00000000-0000-0000-0000-00000000e206';
+  if passed is not false then raise exception 'SMOKE FAIL: auto_fail practical was marked passed'; end if;
+
+  raise notice 'SMOKE OK: practical composite computed; automatic-failure overrides';
+end$$;
