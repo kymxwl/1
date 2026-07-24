@@ -13,5 +13,6 @@ export const DEMO = {
   chapterQuiz: '00000000-0000-0000-0000-000000000201',
   flashcardChapterNumber: 10,
   handReadingChapterNumber: 20,
+  glossaryChapterNumber: 1,
   scheduledMinutes: 240, // 4.00 scheduled clock hours
 } as const;

@@ -12,6 +12,7 @@ import SignInScreen from '@/screens/SignInScreen';
 import PassportScreen from '@/screens/PassportScreen';
 import CourseOutlineScreen from '@/screens/CourseOutlineScreen';
 import PracticeScreen from '@/screens/PracticeScreen';
+import HandbookScreen from '@/screens/HandbookScreen';
 import StaffConsoleScreen from '@/screens/StaffConsoleScreen';
 import { DEMO } from '@/demo';
 
@@ -71,6 +72,9 @@ export default function App() {
         </Tab.Screen>
         <Tab.Screen name="Practice" options={{ title: 'Practice' }}>
           {() => <PracticeScreen />}
+        </Tab.Screen>
+        <Tab.Screen name="Handbook" options={{ title: 'Handbook' }}>
+          {() => <HandbookScreen />}
         </Tab.Screen>
         {role && role !== 'student' && (
           <Tab.Screen name="Staff" options={{ title: 'Staff Console' }}>
