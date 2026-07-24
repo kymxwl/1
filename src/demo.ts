@@ -10,6 +10,6 @@ export const DEMO = {
   enrollmentId: '00000000-0000-0000-0000-000000000501',
   finalFormA: '00000000-0000-0000-0000-000000000202',
   chapterQuiz: '00000000-0000-0000-0000-000000000201',
-  flashcardChapterNumber: 12,
+  flashcardChapterNumber: 10,
   scheduledMinutes: 240, // 4.00 scheduled clock hours
 } as const;

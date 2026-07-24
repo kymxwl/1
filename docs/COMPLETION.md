@@ -29,8 +29,9 @@ accounts / credentials · **[institute]** curriculum & policy owners ·
 - [ ] **[code]** Optional integrity FK `profiles.id → auth.users(id)` once off the demo seed (DEPLOY.md hardening).
 
 ## Phase 3 — Real content + ratified policy
-- [x] **[code]** Curriculum content module (`supabase/content/curriculum_2026_1.sql`) — the 25 chapters + lessons/objectives + policy as an idempotent, institute-editable source of truth (loaded before any cohort; freeze-protected after). Titles/hours/objectives are a professional starting structure to verify against the manual.
-- [ ] **[institute]** Verify/replace the chapter content vs the real manual; add lecture-deck URLs and flash-card decks.
+- [x] **[code]** Curriculum content module (`supabase/content/curriculum_2026_1.sql`) — built from **TGI Manual v1**: the real 25 chapters (four sections, clock hours = 100), lessons whose objectives are the manual's own subsections, and the **Performance Benchmarks** table as skills (Full Shuffle 24/22/20 s, 9-Handed Deal 22/20/18 s, Hand Reading 85/90/95 %, Side Pots & Showdowns pass). Idempotent, institute-editable, freeze-protected once a cohort pins it.
+- [ ] **[institute]** Add lecture-deck URLs and flash-card decks; expand per-chapter lessons if desired.
+- [ ] **[decision — flagged]** **Reconcile completion/distinction rules with the manual.** The manual's *Program Completion Requirements* (pass written; **practical ≥ 80% composite**; **Silver+** in all timed/accuracy skills; competency in each game variant; attendance **≥ 90%**) and *Distinction* (**93%+ on BOTH written AND practical**, Gold in all skills, **no game-protection failures**, perfect attendance) are **stricter/broader than the implemented rule** (which follows the original spec: written ≥ 93, all-gold, perfect attendance, full hours). Aligning to the manual needs a modeled **practical-exam score** and a **game-protection-failure** signal, plus an edit to `evaluate_completion()`. Do NOT change silently — ratify with the institute/TWC first.
 - [ ] **[institute]** Full question banks: Appendix L **Form A** and secure **Form B** (~100 each), with explanations.
 - [ ] **[institute]** Skill benchmarks (Bronze/Silver/Gold thresholds) per competency.
 - [ ] **[TWC + institute]** Ratify the 8 Open Decisions in `docs/DECISIONS.md` (stored as data — confirm or edit values, no code change).
