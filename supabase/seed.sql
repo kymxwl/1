@@ -35,6 +35,9 @@ insert into payment_records (student_id, pathway, is_approved) values
 -- to this file's directory (supabase/).
 \ir content/curriculum_2026_1.sql
 
+-- Appendix L — the real 100-question written final (instructor-graded).
+\ir content/exam_appendix_l_2026_1.sql
+
 -- A couple of student-visible resources.
 insert into resources (owner_type, owner_id, kind, title, url, visibility)
 select 'chapter', ch.id, 'flashcards', ch.title || ' Flash Cards',

@@ -54,7 +54,7 @@ path to production see [`docs/COMPLETION.md`](docs/COMPLETION.md).
 
 ```
 supabase/
-  migrations/       16 ordered SQL migrations (schema → functions → RLS → guards → storage → auth)
+  migrations/       17 ordered SQL migrations (schema → functions → RLS → guards → storage → auth → written-exam)
   functions/        issue-certificate edge function (M8)
   seed.sql          demo data (safe on `supabase db reset`)
   config.toml       local Supabase config

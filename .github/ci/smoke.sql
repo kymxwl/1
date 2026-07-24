@@ -173,3 +173,53 @@ begin
 
   raise notice 'SMOKE OK: set_user_role is admin-gated';
 end$$;
+
+-- Written exam (Appendix L): 100 instructor-graded questions. grade_attempt
+-- must REFUSE it; grade_written_attempt computes from per-question marks.
+do $$
+declare
+  qcount   int;
+  refused  boolean := false;
+  marks    jsonb;
+  score    numeric;
+begin
+  select count(*) into qcount
+  from assessment_questions where assessment_id = '00000000-0000-0000-0000-000000000204';
+  if qcount <> 100 then
+    raise exception 'SMOKE FAIL: Appendix L exam has % questions, expected 100', qcount;
+  end if;
+
+  -- Proctored attempt on the written final for Sam (…501).
+  insert into assessment_attempts (id, enrollment_id, assessment_id, attempt_number, proctored_by, responses)
+  values ('00000000-0000-0000-0000-00000000e204','00000000-0000-0000-0000-000000000501',
+          '00000000-0000-0000-0000-000000000204', 1, '00000000-0000-0000-0000-0000000000b1', '{}');
+
+  -- Auto-grader must refuse a manual-graded exam.
+  begin
+    perform grade_attempt('00000000-0000-0000-0000-00000000e204');
+  exception when others then
+    refused := true;
+  end;
+  if not refused then
+    raise exception 'SMOKE FAIL: grade_attempt did not refuse the instructor-graded exam';
+  end if;
+
+  -- Instructor marks the first 80 questions correct -> 80%.
+  select jsonb_object_agg(question_id::text, case when seq <= 80 then 1 else 0 end) into marks
+  from (
+    select question_id, row_number() over (order by sequence) as seq
+    from assessment_questions where assessment_id = '00000000-0000-0000-0000-000000000204'
+  ) t;
+
+  -- Grade as the proctor (Ivan, …b1).
+  perform set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000b1', true);
+  score := grade_written_attempt('00000000-0000-0000-0000-00000000e204', marks);
+  if score <> 80.00 then
+    raise exception 'SMOKE FAIL: written score %, expected 80.00', score;
+  end if;
+  if (select passed from assessment_attempts where id = '00000000-0000-0000-0000-00000000e204') is not true then
+    raise exception 'SMOKE FAIL: 80%% written exam not marked passed (pass=70)';
+  end if;
+
+  raise notice 'SMOKE OK: written exam refuses auto-grade; grade_written_attempt computes 80%%';
+end$$;

@@ -167,6 +167,7 @@ export interface Database {
     Functions: {
       clock_hours_for: { Args: { p_enrollment_id: string }; Returns: number };
       grade_attempt: { Args: { p_attempt_id: string }; Returns: number };
+      grade_written_attempt: { Args: { p_attempt_id: string; p_marks: Json }; Returns: number };
       evaluate_completion: { Args: { p_enrollment_id: string }; Returns: string };
       issue_certificate: {
         Args: { p_completion_evaluation_id: string; p_issued_by?: string };
